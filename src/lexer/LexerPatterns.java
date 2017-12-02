@@ -14,6 +14,9 @@ public class LexerPatterns {
     static final String WHITESPACE_NEWLINE = "[\\s]+|[\n]+";
     static final String NEWLINE = "[\n]+";
     static final String COMMENT = "[\\;].";
-    static final String SYMBOL = "\\(+|\\)+";
-    static final String INCLUDE_SYMBOL = ".(\\(+|\\)+).";
+    static final String START_SYMBOL = "[(]";
+    static final String END_SYMBOL = "[)]";
+    static final String START_SYMBOL_WITH_WHITESPACE = " ( ";
+    static final String END_SYMBOL_WITH_WHITESPACE = " ) ";
+    static final String CONTINUED_SYMBOL = "(\\S(\\(+|\\)+)\\S?)|(\\S?(\\(+|\\)+)\\S)";
 }

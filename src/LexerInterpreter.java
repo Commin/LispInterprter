@@ -13,7 +13,7 @@ import java.util.Vector;
 public class LexerInterpreter {
     public static void main(String[] args) {
         try {
-            Lexer l = new Lexer("(- 40 45 (CAR (43 54)" +
+            Lexer l = new Lexer("(- 40 45 (CAR (43 54)\n" +
                     "))))))");
             Vector<String> tokens = l.getTokens();
             System.out.println("size= " +tokens.size());
