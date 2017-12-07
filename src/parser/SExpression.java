@@ -18,6 +18,7 @@ public class SExpression extends TreeNode {
 
     public SExpression(Vector<String> s) throws ParseException{
         consConstructor(s);
+        ParseLogger.getInstance().println(this.getClass().getName()+".SExpression(Vector)",this.toListString());
     }
 
     public SExpression(TreeNode t) throws ParseException{
@@ -36,7 +37,7 @@ public class SExpression extends TreeNode {
         data = d;
         addressTokens = a.tokens;
         dataTokens = d.tokens;
-        tokens = new Vector <String> ();
+        tokens = new Vector<>();
         tokens.add("(");
         tokens.addAll(a.tokens);
         tokens.add(".");
@@ -45,27 +46,31 @@ public class SExpression extends TreeNode {
     }
 
     private void consConstructor(Vector<String> s) throws ParseException{
-        if(s.size() >0 && s.get(0).matches("[(]")){
+        if(s.size() >0 && s.get(0).matches(Patterns.START_PARENTHESIS)){
             int i = 1;
             int dataStart = 3;
                 int open = 1;
-            if("(".equals(s.get(i))){
+            if(Patterns.START_PARENTHESIS.equals(s.get(i))){
                 while (open > 0 && i < s.size()) {
                     i++;
-                    if ("(".equals(s.get(i))){
+                    if (Patterns.START_PARENTHESIS.equals(s.get(i))){
                         open ++;
-                    } else if (")".equals(s.get(i))){
+                    } else if (Patterns.END_PARENTHESIS.equals(s.get(i))){
                         open --;
                     }
                 }
                 dataStart = i + 1;
             }
-            i = dataStart >3 ? s.indexOf(".", dataStart) : 2;
+            i = dataStart >3 ? s.indexOf(Patterns.DOT, dataStart) : 2;
+//            ParseLogger.getInstance().println(this.getClass().getName()+".consConstructor(Vecotr)",
+//                    "this is addressTokens: "+s.subList(1,i).toString());
             addressTokens = new Vector<>(s.subList(1,i));
             address = TreeNode.create(addressTokens);
+//            ParseLogger.getInstance().println(this.getClass().getName()+".consConstructor(Vecotr)",
+//                    "this is dataTokens: "+s.subList(i+1,s.size() -1).toString());
             dataTokens = new Vector<>(s.subList(i+1,s.size() -1));
             data = TreeNode.create(dataTokens);
-            tokens = new Vector<String>();
+            tokens = new Vector<>();
             tokens.add("(");
             tokens.addAll(addressTokens);
             tokens.add(".");
@@ -124,28 +129,31 @@ public class SExpression extends TreeNode {
      * This is the main evaluation function for an SExpression.
      *
      * @param numericFlag Whether or not to interpret numeric literally
-     * @return The TreeNode representation of the result
-     * @throws ParseException If the function name, variable, etc. is undefined
+     * @return The TreeNode representing the result
+     * @throws ParseException If the function name, variable, etc. are undefined
      */
     @Override
     TreeNode evaluate(boolean numericFlag) throws ParseException {
+        ParseLogger.getInstance().println(this.getClass().getName()+".evaluate(boolean)", toString());
         String a = address.evaluate().toString();
         SExpression params;
         TreeNode rtn;
 
-        if( numericFlag && a.matches(Patterns.NUMERIC_ATOM)){
+
+        if(numericFlag && a.matches(Patterns.NUMERIC_ATOM)){
+            ParseLogger.getInstance().println(this.getClass().getName()+".evaluate(boolean)","numberic");
             return address.evaluate();
-        } else if (a.matches("NIL")){
+        } else if (a.matches(Patterns.NIL)){
             return Primitives.NIL();
-        } else if (a.matches("T")){
+        } else if (a.matches(Patterns.T)){
             return Primitives.T();
         } else if (Environment.varIsDefined(a)){
             return Environment.getVarValue(a);
         } else if (Environment.functionIsDefined(a)){
             return Environment.executeFunction(a,TreeNode.create(dataTokens));
-        } else if (a.matches("DEFUN")){
+        } else if (a.matches(Patterns.DEFUN)){
             return Primitives.DEFUN((SExpression) data);
-        } else if (a.matches("CAR")|| a.matches("CDR") ) {
+        } else if (a.matches(Patterns.CAR)|| a.matches(Patterns.CDR)) {
             SExpression s;
             if (data.isList()) {
                 s = new SExpression(dataTokens);
@@ -175,9 +183,9 @@ public class SExpression extends TreeNode {
         java.lang.reflect.Method method = Primitives.class.getDeclaredMethod(name, SExpression.class);
         method.setAccessible(true);
         Object o = method.invoke(null,obj);
-        if(o.toString().matches("true")){
+        if(o.toString().matches(Patterns.TRUE)){
             return new Atom("T");
-        } else if (o.toString().matches("false")){
+        } else if (o.toString().matches(Patterns.FALSE)){
             return new Atom("NIL");
         } else {
             return (TreeNode) o;
@@ -197,4 +205,9 @@ public class SExpression extends TreeNode {
     TreeNode evaluate(Hashtable<String, TreeNode> env) throws ParseException {
         return evaluate(false, env);
     }
+
+
+
 }
+
+

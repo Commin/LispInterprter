@@ -59,8 +59,10 @@ abstract class TreeNode {
     static TreeNode create(Vector<String> s)throws ParseException{
         if (s.size()>0) {
             if (s.get(0).matches(Patterns.START_PARENTHESIS)) {
+                ParseLogger.getInstance().println("ParseTree"+".create(Vector)","this is an S-Expression: "+s.toString());
                 return new SExpression(s);
             } else {
+                ParseLogger.getInstance().println("ParseTree"+".create(Vector)","this is an Atom: "+s.get(0));
                 return new Atom(s.get(0));
             }
         } else {

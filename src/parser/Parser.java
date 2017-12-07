@@ -46,22 +46,29 @@ public class Parser {
             }
 
             Vector<String> tmp = new Vector<>(tokens.subList(i, indexEnd+1));
-            System.out.println(i +" " + indexBegin + " " + indexEnd);
-            for (String str: tmp) {
-                System.out.print(str + " ~ ");
-            }
-            System.out.println();
+            ParseLogger.getInstance().println(getClass().getName()+".Parser()",
+                        i +" " + indexBegin + " " + indexEnd);
 
-            t = convertToDotNotation( new Vector <String> (tokens.subList(i, indexEnd+1)));
+//            for (String str: tmp) {
+//                System.out.print(str + " ~ ");
+//            }
+//            System.out.println();
+
+            t = convertToDotNotation(new Vector <String> (tokens.subList(i, indexEnd+1)));
+            ParseLogger.getInstance().println(getClass().getName()+".Parser()",i+"次: "+statements.toString());
             statements.add(new ParseTree(t));
-
             i = indexEnd + 1;
         }
+
+
+
+        ParseLogger.getInstance().println(getClass().getName()+".Parser()","over--------------");
+        ParseLogger.getInstance().println(getClass().getName()+".Parser()","statements size: "+statements.size());
     }
 
     public void evaluate() throws ParseException{
         for (int i = 0; i < statements.size(); i++) {
-            System.out.println(statements.get(i).toString());
+            ParseLogger.getInstance().println(getClass().getName()+".evaluate()",statements.get(i).evaluate());
         }
     }
 
@@ -69,7 +76,7 @@ public class Parser {
         Vector<String> r = new Vector<String>();
         Vector<String> tmp;
         int nextInnerToken;
-        if (s.get(0).matches("[(]")) {
+        if (s.get(0).matches(Patterns.START_PARENTHESIS)) {
             // We have a list or S-Expression
 
             int closeParen = endOfExpression(s);
@@ -81,26 +88,26 @@ public class Parser {
                     // There is more than one token - so not ( a )
 
                     // Is the first one a nested expression?
-                    if (s.get(1).matches("[(]")) {
+                    if (s.get(1).matches(Patterns.START_PARENTHESIS)) {
                         nextInnerToken = endOfExpression(new Vector<String>(s.subList(1, closeParen))) + 2;
                     } else {
                         nextInnerToken = 2;
                     }
 
-                    if (!s.get(nextInnerToken).matches("[.]")) {
+                    if (!s.get(nextInnerToken).matches(Patterns.DOT)) {
                         // The expression must be a list because it is not in dot-notation
-                        r.addAll(convertToDotNotation(new Vector <String>(s.subList(1,nextInnerToken))));
+                        r.addAll(convertToDotNotation(new Vector <>(s.subList(1,nextInnerToken))));
                         r.add(".");
-                        tmp = new Vector <String>();
+                        tmp = new Vector <>();
                         tmp.add("(");
                         tmp.addAll(s.subList(nextInnerToken, closeParen));
                         tmp.add(")");
                         r.addAll(convertToDotNotation(tmp));
                     } else {
                         // Since it is in the form of ( [stuff] . [stuff] ), we pass [stuff] to be converted
-                        r.addAll(convertToDotNotation(new Vector <String>(s.subList(1,nextInnerToken))));
+                        r.addAll(convertToDotNotation(new Vector <>(s.subList(1,nextInnerToken))));
                         r.add(".");
-                        r.addAll(convertToDotNotation(new Vector <String>(s.subList(nextInnerToken+1, closeParen))));
+                        r.addAll(convertToDotNotation(new Vector <>(s.subList(nextInnerToken+1, closeParen))));
                     }
                 } else {
                     // The statement is in the form ( a )
@@ -114,14 +121,15 @@ public class Parser {
                 r.add("NIL");
             }
         } else {
-            if (s.indexOf("(") > 0) {
+            if (s.indexOf(Patterns.START_PARENTHESIS) > 0) {
                 r.addAll(s.subList(0, s.indexOf("(")));
-                r.addAll(convertToDotNotation(new Vector<String>
+                r.addAll(convertToDotNotation(new Vector<>
                         (s.subList(s.indexOf("("), s.size()))));
             } else {
                 r = s;
             }
         }
+//        ParseLogger.getInstance().println(getClass().getName()+".convertToDotNotation()",r.toString());
         return r;
     }
 
@@ -135,7 +143,7 @@ public class Parser {
      * @throws ArrayIndexOutOfBoundsException If the statement does not have a closing parenthesis
      */
     private int endOfExpression(Vector<String> s) throws IllegalArgumentException, ArrayIndexOutOfBoundsException{
-        if(!s.get(0).matches("[(]")){
+        if(!s.get(0).matches(Patterns.START_PARENTHESIS)){
             throw new IllegalArgumentException("ERROR: Cannot find the expression begin with '('.");
         }
         int openPairs = 1;
@@ -145,9 +153,9 @@ public class Parser {
                 throw new ArrayIndexOutOfBoundsException("ERROR: Unbalanced parentheses.");
             }
 
-            if ( s.get(end).matches("[)]")){
+            if ( s.get(end).matches(Patterns.END_PARENTHESIS)){
                 openPairs--;
-            } else if (s.get(end).matches("[(]")){
+            } else if (s.get(end).matches(Patterns.START_PARENTHESIS)){
                 openPairs++;
             }
 
@@ -156,22 +164,5 @@ public class Parser {
             }
         }
         return end;
-    }
-
-    public static void main(String[] args) {
-        String[] s = "( % 3 ( - 7 5 ) )".split(" ");
-
-        Vector<String> tokens = new Vector<String>(Arrays.asList(s));
-        for (String st:tokens) {
-            System.out.print(st+ " ");
-        }
-        System.out.println();
-        try {
-            Parser p = new Parser(tokens);
-            p.evaluate();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
     }
 }

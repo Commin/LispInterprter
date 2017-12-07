@@ -63,6 +63,7 @@ public class Lexer {
             strings[i] = strings[i].replaceAll(LexerPatterns.START_SYMBOL,LexerPatterns.START_SYMBOL_WITH_WHITESPACE);
             strings[i] = strings[i].replaceAll(LexerPatterns.END_SYMBOL,LexerPatterns.END_SYMBOL_WITH_WHITESPACE);
 
+
             String[] tokenStrings = strings[i].split(LexerPatterns.WHITESPACE);
             for (int j = 0; j < tokenStrings.length; j++) {
                 if(!"".equals(tokenStrings[j])) {

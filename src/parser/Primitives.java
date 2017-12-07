@@ -148,7 +148,7 @@ public class Primitives {
                 >= Integer.parseInt(s.data.evaluate(true).toString()));
     }
 
-    public static TreeNode QUOTE (SExpression s) throws ParseException{
+    public static TreeNode QUOTE (SExpression s) {
         return s.address;
     }
 
@@ -174,6 +174,9 @@ public class Primitives {
     }
 
     private static boolean primitiveExists(String name){
+        name = name.toUpperCase();
+
+
         java.lang.reflect.Method method;
         try {
             method = Primitives.class.getDeclaredMethod(name, SExpression.class);

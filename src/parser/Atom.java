@@ -13,23 +13,26 @@ public class Atom extends TreeNode {
     private String literalString;
 
     public Atom(String s) throws ParseException {
+        //TODO need to test the condition function
+        s = Patterns.getInstance().replaceOperator(s);
         if ( ! s.matches(Patterns.LITERAL) && ! s.matches(Patterns.NUMERIC_ATOM) ){
-            throw new ParseException("Error!");
+            throw new ParseException("Can't recognize the atom identifier.");
         }
         literalString = s;
         tokens = new Vector<>();
         tokens.add(literalString);
+//       ParseLogger.getInstance().println(this.getClass().getName()+".Atom(String)",tokens.get(0));
     }
 
     public Atom(boolean b){
         literalString = b ? "T" : "NIL";
-        tokens = new Vector<String> ();
+        tokens = new Vector<> ();
         tokens.add(literalString);
     }
 
     public Atom(int i){
         literalString = Integer.toString(i);
-        tokens = new Vector<String> ();
+        tokens = new Vector<> ();
         tokens.add(literalString);
     }
 

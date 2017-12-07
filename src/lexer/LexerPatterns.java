@@ -18,5 +18,7 @@ public class LexerPatterns {
     static final String END_SYMBOL = "[)]";
     static final String START_SYMBOL_WITH_WHITESPACE = " ( ";
     static final String END_SYMBOL_WITH_WHITESPACE = " ) ";
-    static final String CONTINUED_SYMBOL = "(\\S(\\(+|\\)+)\\S?)|(\\S?(\\(+|\\)+)\\S)";
+
+
+
 }
