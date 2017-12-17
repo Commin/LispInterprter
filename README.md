@@ -1,16 +1,13 @@
-# LispInterprter
+# Lisp Interprter
 committed by commin
-## Structure
+An interpreter for Lisp written with Java.
 
-Lexer and Parser
+Entry function: `Lisp.Main()`
 
-### Lexer
-
-Lexer function is designed to capture the takens of program codes.
-Now the function completed.
-
-### Parser
-
-Parser functions are designed to list the statements from takens, and evaluate the statements.
-
-Now, we have completed the first function.
+## Characteristics
+ 
+* Only support integer, don't support float.
+* Don't support String.
+* Don't support dot-notation.
+* `let` only support definition of single variable.
+* Simplified statement of `quote list` must use parenthesized statements like `(' (a b))`
