@@ -11,4 +11,4 @@ Entry function: `Lisp.Main()`
 * Don't support String.
 * Don't support dot-notation.
 * `let` only support definition of single variable.
-* Simplified statement of `quote list` must use parenthesized statements like `(' (a b))`
+* Simplified statement of `quote list` must use parenthesized statements like `(' (a b))`, but support `'a`.
